@@ -42,11 +42,9 @@
       <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
+            <state relative-caret-position="347">
               <caret line="22" column="33" lean-forward="false" selection-start-line="22" selection-start-column="33" selection-end-line="22" selection-end-column="33" />
-              <folding>
-                <marker date="1497293621000" expanded="true" signature="108:142" ph="{&quot;firebase&quot;: &quot;^4.1.2&quot;...}" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -302,12 +300,12 @@
       <workItem from="1496821273265" duration="1681000" />
       <workItem from="1496925701433" duration="21821000" />
       <workItem from="1497008216054" duration="6902000" />
-      <workItem from="1497287291718" duration="5541000" />
+      <workItem from="1497287291718" duration="5904000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="64612000" />
+    <option name="totallyTimeSpent" value="64975000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1920" y="22" width="1920" height="1058" extended-state="6" />
@@ -674,11 +672,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
+        <state relative-caret-position="347">
           <caret line="22" column="33" lean-forward="false" selection-start-line="22" selection-start-column="33" selection-end-line="22" selection-end-column="33" />
-          <folding>
-            <marker date="1497293621000" expanded="true" signature="108:142" ph="{&quot;firebase&quot;: &quot;^4.1.2&quot;...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
