@@ -136,7 +136,7 @@ class App extends Component {
             let areaName = this.state.eniroObjects[areaObj].name;
             console.log('areaString=', areaString, 'enirobj=', this.state.eniroObjects);
 
-            let url = 'https://api.openweathermap.org/data/2.5/weather?q=' + areaString + '&appid=2595fb7107f846f987d02a10a692056d&units=metric&lang=sv';
+            let url = 'http://api.openweathermap.org/data/2.5/weather?q=' + areaString + '&appid=2595fb7107f846f987d02a10a692056d&units=metric&lang=sv';
 
             fetch(url)
                 .then(response => response.json())
