@@ -3,33 +3,34 @@ import './App.css';
 import Script from "./Script";
 import GithubLogin from "./githubLogin";
 import * as firebase from 'firebase';
-class App extends Component {
 
+class App extends Component {
 
 
     constructor(props) {
         super(props);
         this.state = {
             temp: [],
-
             eniroObjects: [
                 {
                     name: '',
                     postArea: ''
                 }
             ],
-
-
-            searchInput: ''
+            searchInput: '',
+            favorites: []
         };
 
         let config = {
-            apiKey: "AIzaSyD8xzaxvu3ZfoZHkziiWO4GUecvb20t3oU",
-            authDomain: "first-firebase-8a0b7.firebaseapp.com",
-            databaseURL: "https://first-firebase-8a0b7.firebaseio.com",
-            storageBucket: "first-firebase-8a0b7.appspot.com",
-            messagingSenderId: "711306822483"
+            apiKey: "AIzaSyA930moeZzCRNqF7c7x0novuo674LKkhS8",
+            authDomain: "fir-ajax-react-projekt.firebaseapp.com",
+            databaseURL: "https://fir-ajax-react-projekt.firebaseio.com",
+            projectId: "fir-ajax-react-projekt",
+            storageBucket: "fir-ajax-react-projekt.appspot.com",
+            messagingSenderId: "792291248306"
         };
+
+
         firebase.initializeApp(config);
 
         this.inputValue = this.inputValue.bind(this);
@@ -39,15 +40,20 @@ class App extends Component {
         this.returnUl = this.returnUl.bind(this);
         this.loginWithGithub = this.loginWithGithub.bind(this);
         this.showLogOut = this.showLogOut.bind(this);
+        this.returnFav = this.returnFav.bind(this);
+    }
+
+    componentDidMount() {
+        this.returnFav();
     }
 
     loginWithGithub() {
 
         let login_btn = document.getElementById('gh_btn');
-        login_btn.style.visibility= 'hidden';
+        login_btn.style.visibility = 'hidden';
 
         let logout_btn = document.getElementById('gh_btn_out');
-        logout_btn.style.visibility= 'visible';
+        logout_btn.style.visibility = 'visible';
 
         let provider = new firebase.auth.GithubAuthProvider();
 
@@ -56,7 +62,9 @@ class App extends Component {
             let token = result.credential.accessToken;
             // The signed-in user info.
             let user = result.user;
-
+            this.setState({
+                auth: true
+            });
             console.log('inloggad');
             console.log(user);
 
@@ -74,15 +82,14 @@ class App extends Component {
         });
 
 
-
     }
 
     showLogOut() {
         let login_btn = document.getElementById('gh_btn');
-        login_btn.style.visibility= 'visible';
+        login_btn.style.visibility = 'visible';
 
         let logout_btn = document.getElementById('gh_btn_out');
-        logout_btn.style.visibility= 'hidden';
+        logout_btn.style.visibility = 'hidden';
 
         firebase.auth().signOut().then(function () {
             console.log('utloggad');
@@ -98,7 +105,7 @@ class App extends Component {
 
     getLocation() {
         let ul_list = document.getElementById('result_ul');
-        ul_list.innerHTML="";
+        ul_list.innerHTML = "";
 
         let inputValue = this.state.searchInput;
 
@@ -166,23 +173,111 @@ class App extends Component {
 
     }
 
+    addToFavorites = event => {
+        let parentElement = event.target.parentNode;
+        let locationData = {
+            locationName: parentElement.childNodes[0].innerText,
+            tempNow: parentElement.childNodes[4].innerText,
+            maxTemp: parentElement.childNodes[12].innerText,
+            minTemp: parentElement.childNodes[20].innerText
+        };
+        let database = firebase.database();
+        firebase.database().ref('locations').push(locationData);
+        this.returnFav()
+    };
+
     returnUl() {
 
         let finalObj = this.state.temp;
-        let finalObjList = finalObj.map((obj, i) => <li  className="search_result_li" key={i}>
-            <span > {obj.name} - {obj.area} <br/> Temp nu: {obj.temp_now} <br/>Max-Temp: {obj.temp_max} <br/>Min-Temp: {obj.temp_min}</span></li>);
+        let finalObjList = finalObj.map((obj, i) => <li className="search_result_li" key={i}>
+            <span> {obj.name} - {obj.area} <br/></span>
+            Temp nu: <span>{obj.temp_now}</span> <br/>
+            Max-Temp: <span>{obj.temp_max}</span> <br/>
+            Min-Temp: <span>{obj.temp_min}</span>
+            <span className="block" onClick={this.addToFavorites}>Add to favorites</span>
+        </li>);
 
         return <ul id="result_ul">{finalObjList}</ul>;
     }
+
+    returnFav() {
+        let that = this;
+        let allFavorites = [];
+        firebase.database().ref('/locations').once('value').then(function (snapshot) {
+            console.log(snapshot.val())
+            let data = snapshot.val();
+            for (let obj in data) {
+                console.log(data[obj], obj)
+                let currentData = {
+                    locationName: data[obj].locationName,
+                    maxTemp: data[obj].maxTemp,
+                    minTemp: data[obj].minTemp,
+                    tempNow: data[obj].tempNow,
+                    id: obj,
+                };
+                allFavorites.push(currentData);
+            }
+            that.setState({
+                favorites: allFavorites
+            })
+        });
+
+        this.removeFromFavorites = event => {
+            let that = this;
+            let locationId = event.target.parentNode.getAttribute('data-id');
+            firebase.database().ref('locations/' + locationId).remove().then(function () {
+                that.returnFav()
+            });
+        };
+
+        this.toggleEditingMode = (id, location) => {
+            this.setState({
+                editing: id,
+                editingValue: location
+            })
+        };
+
+        this.updateTitle = (id) => {
+            firebase.database().ref('locations/' + id).update({
+                locationName: this.state.editingValue
+            }).then(() => {
+                this.returnFav();
+                this.setState({
+                    editing: "",
+                    editingValue: ""
+                })
+            })
+        }
+    }
+
 
     render() {
         return (
             <div className="App">
                 <GithubLogin gh_button={this.loginWithGithub} gh_button_out={this.showLogOut}/>
                 <Script btn={this.getLocationAndWeather} inputValue={this.inputValue} returnUl={this.returnUl}/>
-
+                <ul className="favorites">
+                    {this.state.favorites.map((obj, i) => {
+                        return (
+                            <li key={i} data-id={obj.id}>
+                                <span
+                                    onClick={() => this.toggleEditingMode(obj.id, obj.locationName)}> {obj.locationName} (Klicka här för att byta namn)<br/></span>
+                                {this.state.editing === obj.id &&
+                                <div>
+                                    <input type="text" onChange={(event) => this.setState({editingValue: event.target.value})}
+                                           value={this.state.editingValue}/>
+                                    <button onClick={() => this.updateTitle(obj.id)}>Uppdatera namn</button>
+                                </div>}
+                                Temp nu: <span>{obj.tempNow}</span> <br/>
+                                Max-Temp: <span>{obj.maxTemp}</span> <br/>
+                                Min-Temp: <span>{obj.minTemp}</span>
+                                <span className="block" onClick={this.removeFromFavorites}>Remove from favorites</span>
+                            </li>);
+                    })}
+                </ul>
             </div>
         );
     }
 }
+
 export default App;
